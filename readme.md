@@ -22,8 +22,6 @@ Cursor is an AI-powered code editor built on top of VSCode, integrating powerful
 
 ## Installation
 
-### Quick Installation
-
 1. Download the installation script:
    ```bash
    curl -O https://raw.githubusercontent.com/benny-png/cursor-linux-installer/main/install_cursor.sh
@@ -37,45 +35,6 @@ Cursor is an AI-powered code editor built on top of VSCode, integrating powerful
 3. Run the script:
    ```bash
    ./install_cursor.sh
-   ```
-
-### Manual Installation
-
-If you prefer to install manually:
-
-1. Download the Cursor AppImage:
-   ```bash
-   sudo curl -L https://downloader.cursor.sh/linux/appImage/x64 -o /opt/cursor.appimage
-   sudo chmod +x /opt/cursor.appimage
-   ```
-
-2. Download an icon:
-   ```bash
-   sudo curl -L https://raw.githubusercontent.com/rahuljangirwork/copmany-logos/refs/heads/main/cursor.png -o /opt/cursor.png
-   ```
-
-3. Create a desktop entry:
-   ```bash
-   sudo bash -c 'cat > /usr/share/applications/cursor.desktop << EOL
-   [Desktop Entry]
-   Name=Cursor AI IDE
-   Comment=AI-powered code editor
-   Exec=/opt/cursor.appimage --no-sandbox %F
-   Icon=/opt/cursor.png
-   Terminal=false
-   Type=Application
-   Categories=Development;IDE;TextEditor;
-   MimeType=text/plain;inode/directory;
-   StartupWMClass=Cursor
-   Keywords=cursor;code;editor;ide;ai;
-   EOL'
-   ```
-
-4. Set up command line access:
-   ```bash
-   sudo bash -c 'echo "#!/bin/bash
-   /opt/cursor.appimage --no-sandbox \$@" > /usr/local/bin/cursor'
-   sudo chmod +x /usr/local/bin/cursor
    ```
 
 ## Using the Installation Script
@@ -112,22 +71,6 @@ To uninstall Cursor:
 
 ```bash
 ./install_cursor.sh uninstall
-```
-
-Or manually:
-
-```bash
-# Remove the AppImage
-sudo rm -f /opt/cursor.appimage
-
-# Remove the icon
-sudo rm -f /opt/cursor.png
-
-# Remove the desktop entry
-sudo rm -f /usr/share/applications/cursor.desktop
-
-# Remove the command link
-sudo rm -f /usr/local/bin/cursor
 ```
 
 ## Troubleshooting
@@ -212,3 +155,42 @@ This installation script is provided under the MIT License. Cursor AI IDE has it
 ## Contributing
 
 Contributions to improve this installer are welcome! Please submit a pull request or open an issue on the GitHub repository.
+
+### Manual Installation
+
+If you prefer to install manually:
+
+1. Download the Cursor AppImage:
+   ```bash
+   sudo curl -L https://downloader.cursor.sh/linux/appImage/x64 -o /opt/cursor.appimage
+   sudo chmod +x /opt/cursor.appimage
+   ```
+
+2. Download an icon:
+   ```bash
+   sudo curl -L https://raw.githubusercontent.com/benny-png/cursor-linux-installer/master/cursor.png -o /opt/cursor.png
+   ```
+
+3. Create a desktop entry:
+   ```bash
+   sudo bash -c 'cat > /usr/share/applications/cursor.desktop << EOL
+   [Desktop Entry]
+   Name=Cursor AI IDE
+   Comment=AI-powered code editor
+   Exec=/opt/cursor.appimage --no-sandbox %F
+   Icon=/opt/cursor.png
+   Terminal=false
+   Type=Application
+   Categories=Development;IDE;TextEditor;
+   MimeType=text/plain;inode/directory;
+   StartupWMClass=Cursor
+   Keywords=cursor;code;editor;ide;ai;
+   EOL'
+   ```
+
+4. Set up command line access:
+   ```bash
+   sudo bash -c 'echo "#!/bin/bash
+   /opt/cursor.appimage --no-sandbox \$@" > /usr/local/bin/cursor'
+   sudo chmod +x /usr/local/bin/cursor
+   ```
