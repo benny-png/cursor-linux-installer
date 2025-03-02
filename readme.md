@@ -26,7 +26,7 @@ Cursor is an AI-powered code editor built on top of VSCode, integrating powerful
 
 1. Download the installation script:
    ```bash
-   curl -O https://raw.githubusercontent.com/yourusername/cursor-linux-installer/main/install_cursor.sh
+   curl -O https://raw.githubusercontent.com/benny-png/cursor-linux-installer/main/install_cursor.sh
    ```
 
 2. Make the script executable:
