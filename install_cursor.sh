@@ -10,16 +10,19 @@ installCursor() {
         esac
     fi
 
-    echo "Installing Cursor AI IDE..."
+    echo "Installing/Updating Cursor AI IDE..."
 
-    # URLs for Cursor AppImage and Icon
-    CURSOR_URL="https://downloader.cursor.sh/linux/appImage/x64"
-    ICON_URL="https://raw.githubusercontent.com/benny-png/cursor-linux-installer/master/cursor.png"
+    # Default URL for Cursor AppImage (your initial link)
+    DEFAULT_URL="https://downloader.cursor.sh/linux/appImage/x64"
+    # Use the first argument as the custom URL if provided, otherwise use default
+    CURSOR_URL="${1:-$DEFAULT_URL}"
+    ICON_URL="https://raw.githubusercontent.com/rahuljangirwork/copmany-logos/refs/heads/main/cursor.png"
 
     # Paths for installation
     APPIMAGE_PATH="/opt/cursor.appimage"
     ICON_PATH="/opt/cursor.png"
     DESKTOP_ENTRY_PATH="/usr/share/applications/cursor.desktop"
+    TEMP_PATH="/tmp/cursor.appimage.tmp"
 
     # Detect package manager
     if command -v apt &> /dev/null; then
@@ -64,19 +67,47 @@ installCursor() {
     sudo mkdir -p "$(dirname "$APPIMAGE_PATH")"
     sudo mkdir -p "$(dirname "$DESKTOP_ENTRY_PATH")"
 
-    # Download Cursor AppImage
-    echo "Downloading Cursor AppImage..."
-    if ! sudo curl -L "$CURSOR_URL" -o "$APPIMAGE_PATH"; then
-        echo "Error: Failed to download Cursor AppImage."
+    # Download the Cursor AppImage to a temporary location with retry
+    echo "Fetching the Cursor AppImage from $CURSOR_URL..."
+    MAX_ATTEMPTS=3
+    for ((i=1; i<=MAX_ATTEMPTS; i++)); do
+        if sudo curl -L --progress-bar -o "$TEMP_PATH" "$CURSOR_URL"; then
+            echo "Download successful."
+            break
+        else
+            echo "Attempt $i of $MAX_ATTEMPTS failed. Retrying..."
+            sleep 2
+            if [ $i -eq $MAX_ATTEMPTS ]; then
+                echo "Error: Failed to download Cursor AppImage after $MAX_ATTEMPTS attempts."
+                sudo rm -f "$TEMP_PATH"
+                return 1
+            fi
+        fi
+    done
+
+    # Verify the download (check file size or existence)
+    if [ ! -s "$TEMP_PATH" ]; then
+        echo "Error: Downloaded file is empty or corrupted."
+        sudo rm -f "$TEMP_PATH"
         return 1
     fi
+
+    # Move the downloaded file to the final location and set permissions
+    sudo mv "$TEMP_PATH" "$APPIMAGE_PATH"
     sudo chmod +x "$APPIMAGE_PATH"
+
+    # Fix sandbox permissions (if needed)
+    TEMP_MOUNT=$(ls /tmp/.mount_cursor* 2>/dev/null | head -n 1)
+    if [ -n "$TEMP_MOUNT" ] && [ -f "$TEMP_MOUNT/chrome-sandbox" ]; then
+        echo "Fixing sandbox permissions..."
+        sudo chown root:root "$TEMP_MOUNT/chrome-sandbox"
+        sudo chmod 4755 "$TEMP_MOUNT/chrome-sandbox"
+    fi
 
     # Download Cursor icon
     echo "Downloading Cursor icon..."
     if ! sudo curl -L "$ICON_URL" -o "$ICON_PATH"; then
         echo "Warning: Failed to download Cursor icon. Using a default icon."
-        # Create a simple text file as a fallback icon
         echo "Cursor" | sudo tee "$ICON_PATH" > /dev/null
     fi
 
@@ -107,7 +138,7 @@ EOL
         sudo update-desktop-database
     fi
 
-    echo "Cursor AI IDE installation complete. You can find it in your application menu or run 'cursor' in terminal."
+    echo "Cursor AI IDE installation/update complete. You can find it in your application menu or run 'cursor' in terminal."
 }
 
 uninstallCursor() {
@@ -143,15 +174,18 @@ uninstallCursor() {
 # Main script execution
 case "${1:-install}" in
     install)
-        installCursor
+        # Shift to check for custom URL as the second argument
+        shift
+        installCursor "$1"
         ;;
     uninstall)
         uninstallCursor
         ;;
     *)
-        echo "Usage: $0 [install|uninstall]"
-        echo "  install   - Install or update Cursor AI IDE (default)"
-        echo "  uninstall - Remove Cursor AI IDE"
+        echo "Usage: $0 [install|uninstall] [custom_url]"
+        echo "  install     - Install or update Cursor AI IDE (default URL: https://downloader.cursor.sh/linux/appImage/x64)"
+        echo "  uninstall   - Remove Cursor AI IDE"
+        echo "  custom_url  - Optional: Specify a custom AppImage URL (e.g., https://downloads.cursor.com/...) for installation"
         exit 1
         ;;
 esac
