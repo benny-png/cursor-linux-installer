@@ -16,7 +16,7 @@ installCursor() {
     DEFAULT_URL="https://downloader.cursor.sh/linux/appImage/x64"
     # Use the first argument as the custom URL if provided, otherwise use default
     CURSOR_URL="${1:-$DEFAULT_URL}"
-    ICON_URL="https://raw.githubusercontent.com/rahuljangirwork/copmany-logos/refs/heads/main/cursor.png"
+    ICON_URL="https://raw.githubusercontent.com/benny-png/cursor-linux-installer/refs/heads/master/cursor.png"
 
     # Paths for installation
     APPIMAGE_PATH="/opt/cursor.appimage"
